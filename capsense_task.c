@@ -57,7 +57,7 @@
 *******************************************************************************/
 #define CAPSENSE_INTERRUPT_PRIORITY    	(7)
 
-#define CAPSENSE_SCAN_INTERVAL_MS    	(20)   /* in milliseconds*/
+#define CAPSENSE_SCAN_INTERVAL_MS    	(50)   /* in milliseconds*/
 
 #define NUM_ELEMENTS 					(1)
 

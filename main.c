@@ -15,9 +15,9 @@
 /* Priorities of user tasks in this project. configMAX_PRIORITIES is defined in
  * the FreeRTOSConfig.h and higher priority numbers denote high priority tasks.
  * The idle task has a priority of 0. */
-#define TASK_CLOUD_PRIORITY         (configMAX_PRIORITIES - 2)
-#define TASK_CAPSENSE_PRIORITY      (configMAX_PRIORITIES - 3)
-#define TASK_JOYSTICK_PRIORITY      (configMAX_PRIORITIES - 4)
+#define TASK_CLOUD_PRIORITY         (configMAX_PRIORITIES - 1)
+#define TASK_CAPSENSE_PRIORITY      (configMAX_PRIORITIES - 2)
+#define TASK_JOYSTICK_PRIORITY      (configMAX_PRIORITIES - 3)
 
 /* Stack sizes of user tasks in this project (in WORDs) */
 #define TASK_CLOUD_STACK_SIZE       (configMINIMAL_STACK_SIZE*8)

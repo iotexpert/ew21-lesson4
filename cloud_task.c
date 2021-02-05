@@ -60,7 +60,6 @@
 * Global constants
 *******************************************************************************/
 #define NETWORK_BUFFER_SIZE    		( 1024U )
-#define PUBLISH_INTERVAL_MS    		(100)   /* in milliseconds*/
 
 /* The largest MQTT message we will send is {"motor":100} which is 14 characters including the null termination */
 #define MQTT_MAX_MESSAGE_SIZE 15
@@ -243,19 +242,13 @@ void task_cloud(void* param)
 			pub_msg.payload_len = (uint16_t) strlen(message);
 
 			printf("Sending Motor Speed message: %s\n", message);
+			/* With a QoS of 1, the publish will block until the message is sent/confirmed */
 			result = cy_mqtt_publish( mqtthandle, &pub_msg );
 			if( result != CY_RSLT_SUCCESS )
 			{
 				printf("MQTT Publish Failed!\n");
 			}
-			else
-			{
-				printf("MQTT Publish Complete\n");
-			}
         }
-
-		/* Wait at least 100ms before trying to send another value */
-    	vTaskDelay(PUBLISH_INTERVAL_MS);
     }
 }
 

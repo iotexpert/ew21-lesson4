@@ -58,7 +58,7 @@
 /*******************************************************************************
 * Global constants
 *******************************************************************************/
-#define JOYSTICK_INTERVAL_MS    (100)   /* in milliseconds*/
+#define JOYSTICK_INTERVAL_MS    (50)   /* in milliseconds*/
 #define JOYSTICK_HYSTERESIS		(1)
 
 #define PI 3.14159265359

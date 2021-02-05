@@ -65,7 +65,7 @@
 #define MQTT_WILL_MESSAGE_LENGTH         ( ( uint16_t ) ( sizeof( MQTT_WILL_MESSAGE ) - 1 ) )
 
 /* Set the QoS that is associated with the MQTT publish, and subscribe messages. */
-#define MQTT_MESSAGE_QOS                 ( 0 )
+#define MQTT_MESSAGE_QOS                 ( 1 )
 
 /* The keep-alive interval in seconds used for MQTT ping request. */
 #define MQTT_KEEP_ALIVE_INTERVAL_SECONDS ( 60u )
