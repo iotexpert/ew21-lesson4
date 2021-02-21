@@ -14,11 +14,11 @@
 #define CLOUD_WIFI_SECURITY  CY_WCM_SECURITY_OPEN
 #define CLOUD_WIFI_BAND      CY_WCM_WIFI_BAND_ANY
 
-#define CLOUD_MQTT_BROKER "mqtt.eclipseprojects.io"
-#define CLOUD_MQTT_CLIENT "arh_remote"
-#define CLOUD_MQTT_TOPIC  "motor_speed"
+#define CLOUD_MQTT_BROKER        "mqtt.eclipseprojects.io"
+#define CLOUD_MQTT_CLIENT_PREFIX "arh_remote"
+#define CLOUD_MQTT_TOPIC         "motor_speed"
 
-#define MOTOR_KEY         "motor"
+#define MOTOR_KEY                "motor"
 
 static QueueHandle_t motor_value_q;
 static cy_mqtt_t mqtthandle;
@@ -128,15 +128,18 @@ static void cloud_startMQTT()
 
 	CY_ASSERT(result == CY_RSLT_SUCCESS);
 
+	char clientId[32];
+	srand(xTaskGetTickCount());
+	snprintf(clientId,sizeof(clientId),"%s%6d",CLOUD_MQTT_CLIENT_PREFIX,rand());
     memset( &connect_info, 0, sizeof( cy_mqtt_connect_info_t ) );
-    connect_info.client_id      = CLOUD_MQTT_CLIENT;
+    connect_info.client_id      = clientId;
     connect_info.client_id_len  = strlen(connect_info.client_id);
     connect_info.keep_alive_sec = 60;
     connect_info.will_info      = 0;
 
     result = cy_mqtt_connect( mqtthandle, &connect_info );
 	CY_ASSERT(result == CY_RSLT_SUCCESS);
-	printf("MQTT Connect Success\n");
+	printf("MQTT Connect Success Client=%s\n",clientId);
 
 }
 
