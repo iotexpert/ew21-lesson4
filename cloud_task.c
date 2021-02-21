@@ -1,10 +1,4 @@
-
-#include <stdlib.h>
 #include <stdio.h>
-
-#include "cybsp.h"
-#include "cyhal.h"
-#include "cycfg.h"
 
 #include "FreeRTOS.h"
 #include "task.h"
@@ -15,6 +9,15 @@
 
 #include "cloud_task.h"
 
+#define CLOUD_WIFI_AP        "Guest"
+#define CLOUD_WIFI_PW        ""
+#define CLOUD_WIFI_SECURITY  CY_WCM_SECURITY_OPEN
+#define CLOUD_WIFI_BAND      CY_WCM_WIFI_BAND_ANY
+
+#define CLOUD_MQTT_BROKER "mqtt.eclipseprojects.io"
+#define CLOUD_MQTT_CLIENT "arh_remote"
+#define CLOUD_MQTT_TOPIC  "motor_speed"
+
 static QueueHandle_t motor_value_q;
 static cy_mqtt_t mqtthandle;
 
@@ -23,7 +26,6 @@ static void cloud_startMQTT();
 static void cloud_mqtt_event_cb( cy_mqtt_t mqtt_handle, cy_mqtt_event_t event, void *user_data);
 
 static void cloud_publishMessage(char *topic,char *message);
-
 
 void cloud_task(void* param)
 {
@@ -41,7 +43,7 @@ void cloud_task(void* param)
 
     	xQueueReceive(motor_value_q, &motorSpeed, portMAX_DELAY);
 		snprintf(message, sizeof(message)-1, "{\"motor\":%d}",motorSpeed);
-		cloud_publishMessage("motor_speed",message);
+		cloud_publishMessage(CLOUD_MQTT_TOPIC,message);
 	}
 }
 
@@ -56,11 +58,11 @@ static void cloud_connectWifi()
 	cy_rslt_t result;
 
 	cy_wcm_connect_params_t connect_param = {
-		.ap_credentials.SSID = "CYFI_IOT_EXT",
-		.ap_credentials.password = "cypresswicedwifi101",
-		.ap_credentials.security = CY_WCM_SECURITY_WPA2_AES_PSK,
+		.ap_credentials.SSID = CLOUD_WIFI_AP,
+		.ap_credentials.password = CLOUD_WIFI_PW,
+		.ap_credentials.security = CLOUD_WIFI_SECURITY,
 		.BSSID = {0},
-		.band = CY_WCM_WIFI_BAND_ANY,
+		.band = CLOUD_WIFI_BAND,
 	};
 	cy_wcm_config_t config = {.interface = CY_WCM_INTERFACE_TYPE_STA}; // We are a station (not a Access Point)
 
@@ -104,7 +106,6 @@ static void cloud_connectWifi()
 	} while (result != CY_RSLT_SUCCESS);
 }
 
-
 static void cloud_startMQTT()
 {
 	static cy_mqtt_connect_info_t    	connect_info;
@@ -113,8 +114,8 @@ static void cloud_startMQTT()
 
 	cy_rslt_t result;
 
-	cy_mqtt_init();
-    broker_info.hostname = "mqtt.eclipseprojects.io";
+	result = cy_mqtt_init();
+    broker_info.hostname = CLOUD_MQTT_BROKER;
     broker_info.hostname_len = strlen(broker_info.hostname);
     broker_info.port = 1883;
 
@@ -123,14 +124,17 @@ static void cloud_startMQTT()
                               cloud_mqtt_event_cb, NULL,
                               &mqtthandle );
 
+	CY_ASSERT(result == CY_RSLT_SUCCESS);
+
     memset( &connect_info, 0, sizeof( cy_mqtt_connect_info_t ) );
-    connect_info.client_id      = "arh321";
+    connect_info.client_id      = CLOUD_MQTT_CLIENT;
     connect_info.client_id_len  = strlen(connect_info.client_id);
     connect_info.keep_alive_sec = 60;
     connect_info.will_info      = 0;
 
     result = cy_mqtt_connect( mqtthandle, &connect_info );
 	CY_ASSERT(result == CY_RSLT_SUCCESS);
+	printf("MQTT Connect Success\n");
 
 }
 
