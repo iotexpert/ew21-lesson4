@@ -18,6 +18,8 @@
 #define CLOUD_MQTT_CLIENT "arh_remote"
 #define CLOUD_MQTT_TOPIC  "motor_speed"
 
+#define MOTOR_KEY         "motor"
+
 static QueueHandle_t motor_value_q;
 static cy_mqtt_t mqtthandle;
 
@@ -42,7 +44,7 @@ void cloud_task(void* param)
 		char message[16];
 
     	xQueueReceive(motor_value_q, &motorSpeed, portMAX_DELAY);
-		snprintf(message, sizeof(message)-1, "{\"motor\":%d}",motorSpeed);
+		snprintf(message, sizeof(message)-1, "{\"%s\":%d}",MOTOR_KEY,motorSpeed);
 		cloud_publishMessage(CLOUD_MQTT_TOPIC,message);
 	}
 }
