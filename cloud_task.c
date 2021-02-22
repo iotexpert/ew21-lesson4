@@ -9,14 +9,18 @@
 
 #include "cloud_task.h"
 
-#define CLOUD_WIFI_AP        "Guest"
-#define CLOUD_WIFI_PW        ""
-#define CLOUD_WIFI_SECURITY  CY_WCM_SECURITY_OPEN
+
+#define CLOUD_WIFI_AP        "ew2021"
+#define CLOUD_WIFI_PW        "ew2021ap"
+#define CLOUD_WIFI_SECURITY  CY_WCM_SECURITY_WPA2_AES_PSK
 #define CLOUD_WIFI_BAND      CY_WCM_WIFI_BAND_ANY
 
 #define CLOUD_MQTT_BROKER        "mqtt.eclipseprojects.io"
+//#define CLOUD_MQTT_BROKER        "test.mosquitto.org"
+//#define CLOUD_MQTT_BROKER          "linux.elkhorn-creek.org"
+
 #define CLOUD_MQTT_CLIENT_PREFIX "arh_remote"
-#define CLOUD_MQTT_TOPIC         "motor_speed"
+#define CLOUD_MQTT_TOPIC         "arh_motor_speed"
 
 #define MOTOR_KEY                "motor"
 
@@ -41,7 +45,7 @@ void cloud_task(void* param)
     for(;;)
     {
 		int motorSpeed;
-		char message[16];
+		char message[32];
 
     	xQueueReceive(motor_value_q, &motorSpeed, portMAX_DELAY);
 		snprintf(message, sizeof(message)-1, "{\"%s\":%d}",MOTOR_KEY,motorSpeed);
@@ -63,6 +67,7 @@ static void cloud_connectWifi()
 		.ap_credentials.SSID = CLOUD_WIFI_AP,
 		.ap_credentials.password = CLOUD_WIFI_PW,
 		.ap_credentials.security = CLOUD_WIFI_SECURITY,
+    	.static_ip_settings = 0,
 		.BSSID = {0},
 		.band = CLOUD_WIFI_BAND,
 	};
@@ -106,6 +111,7 @@ static void cloud_connectWifi()
 		}
 
 	} while (result != CY_RSLT_SUCCESS);
+
 }
 
 static void cloud_startMQTT()
@@ -128,7 +134,7 @@ static void cloud_startMQTT()
 
 	CY_ASSERT(result == CY_RSLT_SUCCESS);
 
-	char clientId[32];
+	static char clientId[32];
 	srand(xTaskGetTickCount());
 	snprintf(clientId,sizeof(clientId),"%s%6d",CLOUD_MQTT_CLIENT_PREFIX,rand());
     memset( &connect_info, 0, sizeof( cy_mqtt_connect_info_t ) );
@@ -136,10 +142,12 @@ static void cloud_startMQTT()
     connect_info.client_id_len  = strlen(connect_info.client_id);
     connect_info.keep_alive_sec = 60;
     connect_info.will_info      = 0;
+	connect_info.clean_session = true;
+
 
     result = cy_mqtt_connect( mqtthandle, &connect_info );
 	CY_ASSERT(result == CY_RSLT_SUCCESS);
-	printf("MQTT Connect Success Client=%s\n",clientId);
+	printf("MQTT Connect to %s Success Client=%s\n",CLOUD_MQTT_BROKER,clientId);
 
 }
 
@@ -182,8 +190,7 @@ static void cloud_publishMessage(char *topic,char *message)
 	pub_msg.payload = message;
 	pub_msg.payload_len = strlen(message);
 	
-	cy_rslt_t result = cy_mqtt_publish( mqtthandle, &pub_msg );
-	CY_ASSERT(result == CY_RSLT_SUCCESS);
+	cy_mqtt_publish( mqtthandle, &pub_msg );
 	printf("Published to Topic=%s Message=%s\n",topic,message);
-    
+	
 }

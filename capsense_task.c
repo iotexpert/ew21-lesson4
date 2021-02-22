@@ -67,8 +67,6 @@ static void process_touch(void)
     uint8_t slider_touched = 0;
     cy_stc_capsense_touch_t *slider_touch;
 
-// Process the buttons
-
     button0_status = Cy_CapSense_IsWidgetActive(CY_CAPSENSE_BUTTON0_WDGT_ID,&cy_capsense_context);
     button1_status = Cy_CapSense_IsSensorActive( CY_CAPSENSE_BUTTON1_WDGT_ID, CY_CAPSENSE_BUTTON1_SNS0_ID, &cy_capsense_context);
 
@@ -81,8 +79,7 @@ static void process_touch(void)
     if((0u != button1_status) && (0u == button1_status_prev))
     {
         printf("Button 1 pressed\n");
-        cloud_sendMotorSpeed(50); // Set the motor to 50%
-
+        cloud_sendMotorSpeed(75); // Set the motor to 75%
     }
 
 // Process the slider
@@ -94,7 +91,6 @@ static void process_touch(void)
     {
         printf("Slider position %d\n",slider_pos);
         cloud_sendMotorSpeed(slider_pos);
-
     }
 
     button0_status_prev = button0_status;
