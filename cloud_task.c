@@ -16,8 +16,7 @@
 #define CLOUD_WIFI_BAND      CY_WCM_WIFI_BAND_ANY
 
 #define CLOUD_MQTT_BROKER        "mqtt.eclipseprojects.io"
-//#define CLOUD_MQTT_BROKER        "test.mosquitto.org"
-//#define CLOUD_MQTT_BROKER          "linux.elkhorn-creek.org"
+
 
 #define CLOUD_MQTT_CLIENT_PREFIX "arh_remote"
 #define CLOUD_MQTT_TOPIC         "arh_motor_speed"
@@ -147,7 +146,7 @@ static void cloud_startMQTT()
 
     result = cy_mqtt_connect( mqtthandle, &connect_info );
 	CY_ASSERT(result == CY_RSLT_SUCCESS);
-	printf("MQTT Connect to %s Success Client=%s\n",CLOUD_MQTT_BROKER,clientId);
+	printf("MQTT Connect Success to %s Client=%s\n",CLOUD_MQTT_BROKER,clientId);
 
 }
 
